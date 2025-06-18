@@ -10,31 +10,25 @@ function Home(props) {
   const loadingbar = useRef(null);
   const { category } = useParams();
   const newsCategory = category || props.category || 'general';
-  const apiKey = import.meta.env.VITE_NEWS_API_KEY;
 
+  useEffect(() => {
+    setLoading(true);
+    if (loadingbar.current) loadingbar.current.continuousStart();
 
-useEffect(() => {
-  setLoading(true);
-  if (loadingbar.current) loadingbar.current.continuousStart();
-
-  fetch(`https://newsapi.org/v2/top-headlines?country=us&category=${newsCategory}&apiKey=${apiKey}`)
-    .then((res) => res.json())
-    .then((res) => {
-      setData(res);
-      setLoading(false);
-      setTimeout(() => {
+    fetch(`/api/news?category=${newsCategory}`)
+      .then((res) => res.json())
+      .then((res) => {
+        setData(res);
+        setLoading(false);
         if (loadingbar.current) loadingbar.current.complete();
-      }, 300);
-    })
-    .catch((error) => {
-      console.error("Error fetching news:", error);
-      setLoading(false);
-      setTimeout(() => {
+        console.log(res);
+      })
+      .catch((error) => {
+        console.error("Error fetching news:", error);
+        setLoading(false);
         if (loadingbar.current) loadingbar.current.complete();
-      }, 300);
-    });
-}, [newsCategory]);
-
+      });
+  }, [newsCategory]);
 
   if (loading) return <Spinner />;
 
